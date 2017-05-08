@@ -1,0 +1,1 @@
+add_library(WorkInstrumentation MODULE WorkInstrumentation.cpp)
