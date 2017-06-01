@@ -54,20 +54,32 @@ using namespace llvm;
 
 namespace {
 
-class StripProfMetadataPass : public FunctionPass {
+class StripProfMetadataPass : public ModulePass {
 public:
   static char ID;
-  StripProfMetadataPass() : FunctionPass(ID) {}
+  StripProfMetadataPass() : ModulePass(ID) {}
 
-  bool runOnFunction(Function &F) override {
+  bool runOnModule(Module &M) override {
     bool updated = false;
-    for(auto bb = F.begin(); bb!=F.end(); bb++){
-       Instruction *TI = bb->getTerminator();
-       if(TI==nullptr)continue;
 
-       if(TI->getMetadata(llvm::LLVMContext::MD_prof)!=nullptr){
-          TI->setMetadata(llvm::LLVMContext::MD_prof, nullptr);
+    if(M.getNamedMetadata(Twine("llvm.module.flags")) && M.getMaximumFunctionCount()!=None ){
+       M.eraseNamedMetadata( M.getNamedMetadata(Twine("llvm.module.flags")) );
+       updated = true;
+    }
+    for(auto F = M.begin(); F!=M.end(); F++){
+       if(F->getMetadata(llvm::LLVMContext::MD_prof)!=nullptr){
+          F->setMetadata(llvm::LLVMContext::MD_prof, nullptr);
           updated = true;
+       }
+
+       for(auto bb = F->begin(); bb!=F->end(); bb++){
+          Instruction *TI = bb->getTerminator();
+          if(TI==nullptr)continue;
+
+          if(TI->getMetadata(llvm::LLVMContext::MD_prof)!=nullptr){
+             TI->setMetadata(llvm::LLVMContext::MD_prof, nullptr);
+             updated = true;
+          }
        }
     }
     return updated;
