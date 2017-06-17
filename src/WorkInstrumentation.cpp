@@ -423,12 +423,16 @@ unsigned knapsackBrute(double maxError, unsigned idx, std::vector<BasicBlock*> &
    }
    // Return the maximum of two cases: (1) nth item included (2) not included
    else{
-      unsigned scoreWithout = knapsackBrute(maxError, idx+1, bbs, errors, freq, removed);
-      unsigned scoreWith = freq[bbs[idx]] + knapsackBrute(maxError-errors[bbs[idx]], idx+1, bbs, errors, freq, removed);
+      std::map<BasicBlock *,bool> removedWithout = removed;
+      std::map<BasicBlock *,bool> removedWith = removed;
+      unsigned scoreWithout = knapsackBrute(maxError, idx+1, bbs, errors, freq, removedWithout);
+      unsigned scoreWith = freq[bbs[idx]] + knapsackBrute(maxError-errors[bbs[idx]], idx+1, bbs, errors, freq, removedWith);
       if(scoreWithout>scoreWith){
+         removed = removedWithout;
          removed[bbs[idx]] = false;
          return scoreWithout;
       }else{
+         removed = removedWith;
          removed[bbs[idx]] = true;
          return scoreWith;
       }
