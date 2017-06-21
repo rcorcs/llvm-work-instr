@@ -603,13 +603,13 @@ void relaxInstrDAG(BasicBlock *entry, Loop *loop, std::map<const BasicBlock *,in
       }
    }
    errs() << "Computing the min cost\n";
-   int minVal = minCost(loop->getHeader(),loop,bbCosts,loopInfo);
+   int minVal = minCost(entry,loop,bbCosts,loopInfo);
    errs() << "Min Cost: " << minVal << "\n";
 
    int maxVal;
    if(WorkAvgError){
       errs() << "Computing the max cost\n";
-      maxVal = maxCost(loop->getHeader(),loop,bbCosts,loopInfo);
+      maxVal = maxCost(entry,loop,bbCosts,loopInfo);
       errs() << "Max Cost: " << maxVal << "\n";
    }
    std::vector<BasicBlock*> bbs;
@@ -617,8 +617,11 @@ void relaxInstrDAG(BasicBlock *entry, Loop *loop, std::map<const BasicBlock *,in
    std::map<BasicBlock *,unsigned> freq;
    std::map<BasicBlock *,bool> removed;
 
+
+
    for(BasicBlock *bb : s){
       if(instrBBs[bb]){
+	 errs () << "Processing probe in " << getVertexName(bb) << "\n";
          int probeVal = (instrBBSets[bb].computeCost(bbCosts));
          double percentError;
          if(WorkAvgError)

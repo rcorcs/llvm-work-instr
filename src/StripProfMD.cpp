@@ -62,7 +62,7 @@ public:
   bool runOnModule(Module &M) override {
     bool updated = false;
 
-    if(M.getNamedMetadata(Twine("llvm.module.flags")) && M.getMaximumFunctionCount()!=None ){
+    if(M.getNamedMetadata(Twine("llvm.module.flags"))){// && M.getMaximumFunctionCount()!=None ){
        M.eraseNamedMetadata( M.getNamedMetadata(Twine("llvm.module.flags")) );
        updated = true;
     }
